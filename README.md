@@ -7,7 +7,7 @@ Use `childprocess` module freely while limiting the amount of concurrent process
 ## Includes:
 
 * Limit how many processes are running at the same time. Additional processes will be queued.
-* Supports `fork`, `spawn`, `exec`, `execFile` with the usual signature
+* Supports `fork`, `spawn`, `exec`, `execFile` with the usual signature, with exception of returning an *id* and not a `ChildProcess`.
 * Add an `onCreate` callback to the `options` that you pass, to get a notification when the process was created. One argument will be passed back, containing the `ChildProcess` instance.
 * Call `newQueue` to receive a separate queue that you can use like the main `ChildProcessQueue` object.
 * Call `setMaxProcesses` to set the maximum concurrent processes.
@@ -15,7 +15,7 @@ Use `childprocess` module freely while limiting the amount of concurrent process
 * Call `getCurrentProcessCount` to get the number of currently running processes.
 * Call `getCurrentProcesses` to get an array of the currently running processes.
 * Call `getCurrentQueueSize` to get the number of processes waiting in the queue.
-* All `ChildProcess` calls are chainable.
+* Call `removeFromQueue` with an *id* to remove a pending process from the queue.
 
 ## Installation:
 

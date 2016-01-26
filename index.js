@@ -2,6 +2,13 @@
 
 var ChildProcess = require('child_process');
 
+var last_unique_id = 0;
+
+var generateUniqueId = function () {
+    last_unique_id++;
+    return '_' + last_unique_id;
+};
+
 /**
  * @returns {{
  *   setMaxProcesses: (function(int)),
@@ -9,10 +16,12 @@ var ChildProcess = require('child_process');
  *   getCurrentProcessCount: (function(): int),
  *   getCurrentProcesses: (function(): Array.<ChildProcess>),
  *   getCurrentQueueSize: (function(): int),
- *   fork: (function(...[*])),
- *   spawn: (function(...[*])),
- *   exec: (function(...[*])),
- *   execFile: (function(...[*])),
+ *   removeFromQueue: (function(String): Boolean),
+ *   fork: (function(...[*]): String),
+ *   spawn: (function(...[*]): String),
+ *   exec: (function(...[*]): String),
+ *   exec1: (function(...[*]): String),
+ *   execFile: (function(...[*]): String),
  *   newQueue: newQueue
  * }}
  */
@@ -21,6 +30,7 @@ var newQueue = function newQueue () {
     var MAX_PROCESSES = 5;
 
     var QUEUE = [];
+    var MAP = {};
     var PROCESSES = [];
 
     var removeTerminatedProcess = function (process) {
@@ -42,6 +52,7 @@ var newQueue = function newQueue () {
         }
 
         var next = QUEUE.shift();
+        delete MAP[next.id];
 
         var args = next.args;
 
@@ -139,21 +150,34 @@ var newQueue = function newQueue () {
             return QUEUE.length;
         },
 
+        removeFromQueue: function (id) {
+
+            if (MAP.hasOwnProperty(id)) {
+                delete MAP[id];
+                return true;
+            }
+
+            return false;
+        },
+
         fork: function fork (modulePath /*, args, options*/) {
 
             var args = Array.prototype.slice.call(arguments, 0);
             var onCreate = extractOnCreateFromArgs(args);
 
-            QUEUE.push({
+            var task = {
                 func: 'fork',
                 args: args,
                 callback: onCreate,
-                hasTerminateCallback: false
-            });
+                hasTerminateCallback: false,
+                id: generateUniqueId()
+            };
+            QUEUE.push(task);
+            MAP[task.id] = task;
 
             tryToReleaseQueue();
 
-            return this;
+            return task.id;
         },
 
         spawn: function spawn (command /*, args, options*/) {
@@ -161,16 +185,19 @@ var newQueue = function newQueue () {
             var args = Array.prototype.slice.call(arguments, 0);
             var onCreate = extractOnCreateFromArgs(args);
 
-            QUEUE.push({
+            var task = {
                 func: 'spawn',
                 args: args,
                 callback: onCreate,
-                hasTerminateCallback: false
-            });
+                hasTerminateCallback: false,
+                id: generateUniqueId()
+            };
+            QUEUE.push(task);
+            MAP[task.id] = task;
 
             tryToReleaseQueue();
 
-            return this;
+            return task.id;
         },
 
         exec: function exec (command /*, options, callback*/) {
@@ -178,16 +205,19 @@ var newQueue = function newQueue () {
             var args = Array.prototype.slice.call(arguments, 0);
             var onCreate = extractOnCreateFromArgs(args);
 
-            QUEUE.push({
+            var task = {
                 func: 'exec',
                 args: args,
                 callback: onCreate,
-                hasTerminateCallback: true
-            });
+                hasTerminateCallback: true,
+                id: generateUniqueId()
+            };
+            QUEUE.push(task);
+            MAP[task.id] = task;
 
             tryToReleaseQueue();
 
-            return this;
+            return task.id;
         },
 
         execFile: function execFile (file /*, args, options, callback*/) {
@@ -195,16 +225,19 @@ var newQueue = function newQueue () {
             var args = Array.prototype.slice.call(arguments, 0);
             var onCreate = extractOnCreateFromArgs(args);
 
-            QUEUE.push({
+            var task = {
                 func: 'exec',
                 args: args,
                 callback: onCreate,
-                hasTerminateCallback: true
-            });
+                hasTerminateCallback: true,
+                id: generateUniqueId()
+            };
+            QUEUE.push(task);
+            MAP[task.id] = task;
 
             tryToReleaseQueue();
 
-            return this;
+            return task.id;
         }
 
     };
@@ -223,10 +256,11 @@ var newQueue = function newQueue () {
  *   getCurrentProcessCount: (function(): int),
  *   getCurrentProcesses: (function(): Array.<ChildProcess>),
  *   getCurrentQueueSize: (function(): int),
- *   fork: (function(...[*])),
- *   spawn: (function(...[*])),
- *   exec: (function(...[*])),
- *   execFile: (function(...[*])),
+ *   removeFromQueue: (function(String): Boolean),
+ *   fork: (function(...[*]): String),
+ *   spawn: (function(...[*]): String),
+ *   exec: (function(...[*]): String),
+ *   execFile: (function(...[*]): String),
  *   newQueue: newQueue
  * }}
  */
