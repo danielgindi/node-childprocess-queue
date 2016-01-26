@@ -1,0 +1,28 @@
+{
+  "name": "childprocess-queue",
+  "version": "1.0.0",
+  "description": "Use `childprocess` module freely while limiting the amount of concurrent processes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danielgindi/node-childprocess-queue"
+  },
+  "keywords": [
+    "node.js",
+    "childprocess",
+    "process",
+    "rate limit",
+    "queue"
+  ],
+  "author": "Daniel Cohen Gindi <danielgindi@gmail.com> (https://github.com/danielgindi)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danielgindi/node-childprocess-queue/issues"
+  },
+  "homepage": "https://github.com/danielgindi/node-childprocess-queue",
+  "dependencies": {
+  }
+}
