@@ -1,6 +1,6 @@
 {
   "name": "childprocess-queue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Use `childprocess` module freely while limiting the amount of concurrent processes",
   "main": "index.js",
   "scripts": {
