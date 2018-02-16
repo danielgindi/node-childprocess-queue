@@ -153,7 +153,13 @@ var newQueue = function newQueue () {
         removeFromQueue: function (id) {
 
             if (MAP.hasOwnProperty(id)) {
+                var item = MAP[id];
                 delete MAP[id];
+                
+                var index = QUEUE.indexOf(item);
+                if (index !== -1)
+                    QUEUE.splice(index, 1);
+                
                 return true;
             }
 
